@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2011
+
+This file is part of a Icecast2AllListenersMuninPlugin script to show the count of listeners on mutli icecast relays.
+
+This script is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This Script is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Icecast2AllListenersMuninPlugin. If not, see <http://www.gnu.org/licenses/>.
+=end
+
+require 'rubygems'
+require 'mechanize'
+
+def get_server
+  servers = []
+  servers << {:name => "relay1", :url => "http://192.168.1.1:8000/"}
+  servers << {:name => "relay2", :url => "http://192.168.1.2:8000/"}
+  servers << {:name => "relay3", :url => "http://192.168.1.3:8000/"}
+  servers << {:name => "relay4", :url => "http://192.168.1.4:8000/"}
+  servers << {:name => "internal_relay", :url => "http://foo.bar:8000/"}
+
+  servers
+end
+
+def show_config(servers)
+  puts 'graph_title Icecast2 All Listeners'
+  puts 'graph_category icecast'
+  puts 'graph_info This graph shows all listeners of multi icecast servers'
+  puts 'graph_vlabel Listener'
+  puts 'graph_scale yes'
+  puts 'graph_period count'
+  puts 'ALL_LISTENERS.lable ALL_LISTENERS'
+  servers.each do |server|
+    puts "#{server[:name]}.lable #{server[:name]}"
+  end
+end
+
+
+def show_all_listeners(servers)
+  agent = Mechanize.new
+  all_listeners = 0
+
+  servers.each do |server|
+    server_listeners = 0
+    
+    page = agent.get("#{server[:url]}")
+
+    page.search('//html/body/div/div/table/tr[8]/td[2]').each do |listeners|
+      server_listeners += listeners.text.to_i
+      all_listeners += listeners.text.to_i
+    end
+    puts "#{server[:name]}.value #{server_listeners}"
+  end
+
+  puts "ALL_LISTENERS.value #{all_listeners}"
+end
+
+
+begin
+  servers = get_server
+  
+  if ARGV[0] == "config"
+    show_config(servers)
+  else
+    show_all_listeners(servers)
+  end
+end
