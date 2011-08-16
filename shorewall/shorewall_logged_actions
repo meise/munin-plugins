@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2011
+
+This file is part of a ShorewallLoggedActionsMuninPlugin script to show all logged shorewall actions in Munin.
+
+This script is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This Script is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ShorewallLoggedActionsMuninPlugin.  If not, see <http://www.gnu.org/licenses/>.
+=end
+
+def show_config
+  puts 'graph_title Shorewall actions'
+  puts 'graph_category network'
+  puts 'graph_info This graph shows the logged shorewall actions in syslog'
+  puts 'graph_vlabel Counts'
+  puts 'graph_scale yes'
+  puts 'graph_period count'
+  puts 'drop.label drop'
+  puts 'reject.label reject'
+  puts 'accept.label accept'
+  puts 'port_scans.label port_scans'
+end
+
+def show_logged_action_counts
+  accept = 0
+  drop = 0
+  reject = 0
+  port_scans = 0
+  
+  File.open('/var/log/syslog').each_line do |line|
+    if /\:REJECT\:/ =~ line
+      reject += 1
+      if /DPT=1391\s/ =~ line
+        if /PROTO=TCP/ =~ line
+          port_scans += 1
+        end
+      end
+      next
+    end
+    if /\:DROP\:/ =~ line
+      drop += 1
+      if /DPT=1391\s/ =~ line
+        if /PROTO=TCP/ =~ line
+          port_scans += 1
+        end
+      end
+      next
+    end
+    if /\:ACCEPT\:/ =~ line
+      accept += 1
+      next
+    end
+  end
+
+  puts "accept.value #{accept}"
+  puts "drop.value #{drop}"
+  puts "reject.value #{reject}"
+  puts "port_scans.value #{port_scans}"
+end
+
+begin
+  if ARGV[0] == "config"
+    show_config
+  else
+    show_logged_action_counts
+  end
+end

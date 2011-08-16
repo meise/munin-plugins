@@ -1,0 +1,86 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2011
+
+This file is part of a ShorewallConnectionsMuninPlugin script to show Shorewall connections in Munin.
+
+This script is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This Script is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ShorewallConnectionsMuninPlugin.  If not, see <http://www.gnu.org/licenses/>.
+=end
+
+def show_config
+  puts 'graph_title Shorewall connections'
+  puts 'graph_category network'
+  puts 'graph_info This graph shows the count of shorewall connections'
+  puts 'graph_vlabel Connections'
+  puts 'graph_scale yes'
+  puts 'graph_period count'
+  puts 'connection_count.label ALL_CONNECTIONS'
+  puts "connection_time_wait.label TIMEWAIT"
+  puts "connection_fin_wait.label FINWAIT"
+  puts "connection_established.label ESTABLISHED"
+  puts "connection_close.label CLOSE"
+  puts "connection_udp.label UDP"
+end
+ 
+def show_connections
+  established = 0
+  close = 0
+  time_wait = 0
+  fin_wait = 0
+  udp = 0
+
+  all_connections =  %x[sudo shorewall show connections].split(/\n/)
+  connection_count = all_connections.count
+
+  all_connections.each do |connection|
+    if /udp/ =~ connection
+      udp += 1
+      next
+    end
+
+    if /TIME_WAIT/ =~ connection
+      time_wait += 1
+      next
+    end
+    if /FIN_WAIT/ =~ connection
+      fin_wait += 1
+      next
+    end
+    if /ESTABLISHED/ =~ connection
+      established += 1
+      next
+    end
+    if /CLOSE/ =~ connection
+      close += 1
+      next
+    end
+  end
+
+  puts "connection_time_wait.value #{time_wait}"
+  puts "connection_fin_wait.value #{fin_wait}"
+  puts "connection_established.value #{established}"
+  puts "connection_close.value #{close}"
+  puts "connection_count.value #{connection_count}"
+  puts "connection_udp.value #{udp}"
+end
+
+begin
+  if ARGV[0] == "config"
+    show_config
+  else
+    show_connections
+  end
+end
+

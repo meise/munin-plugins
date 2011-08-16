@@ -1,0 +1,82 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2011
+
+This file is part of a ShorewallAccountingMuninPlugin script to show Shorewall accounting data in munin.
+
+This script is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This Script is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ShorewallAccountingMuninPlugin.  If not, see <http://www.gnu.org/licenses/>.
+=end
+
+def show_config(accounting_data)
+  puts 'graph_title Shorewall accounting'
+  puts 'graph_category network'
+  puts 'graph_info This graph shows all shorewall accounting data'
+  puts 'graph_vlabel Gigabytes'
+  puts 'graph_scale yes'
+  puts 'graph_period count'
+  accounting_data.each do |line|
+    # generates extern1-0.0.0.0/0_to_intern-0,0,0,0/0.label extern1-0.0.0.0/0_to_intern-0,0,0,0/0
+    puts "#{line[5]}-#{line[7]}_to_#{line[6]}-#{line[8]}.label #{line[5]}-#{line[7]}_to_#{line[6]}-#{line[8]}"
+  end
+end
+
+def get_accounting_data
+  accounting_data = %x[sudo shorewall -x show accounting]
+  accounting_data = all_accounting_data.split(/\n/)
+
+  # without all gratuitous data (header, counter reset date etc.)
+  normalised_accounting_data = []
+
+  accounting_data.each do |line|
+    # split every accounting line into a separate array and removed all whitespaces
+    line = line.split
+
+    # choose the next one if the first entry in array is not a number or empty
+    next if /^\D/ =~ line[0] or
+            line.empty?
+
+    line[]
+
+    normalised_accounting_data << line
+  end
+  normalised_accounting_data
+end
+
+def show_accounting(accounting_data)
+
+  accounting_data.each do |line|
+
+    # conversion into gigabyte
+    3.times do
+      line[1] = line[1].to_f/1000
+    end
+
+    # generates extern1-0.0.0.0/0_to_intern-0,0,0,0/0.value 254654
+    #           line[5]  line[7]     line[6]  line[8] line[1]
+    puts "#{line[5]}-#{line[7]}_to_#{line[6]}-#{line[8]}.value #{line[1]}"
+  end
+end
+
+
+begin
+  accounting_data = get_accounting_data
+
+  if ARGV[0] == "config"
+    show_config(accounting_data)
+  else
+    show_accounting(accounting_data)
+  end
+end
+
