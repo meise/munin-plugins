@@ -57,7 +57,7 @@ def show_all_listeners(servers)
 
     page.search('//html/body/div/div/table/tr[8]/td[2]').each do |stream_listeners|
       server_listeners += stream_listeners.text.to_i
-      all_listeners += listeners.text.to_i
+      all_listeners += stream_listeners.text.to_i
     end
     puts "#{server[:name]}.value #{server_listeners}"
   end
