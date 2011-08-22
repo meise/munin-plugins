@@ -40,12 +40,11 @@ def show_config(servers)
   puts 'graph_vlabel Listener'
   puts 'graph_scale yes'
   puts 'graph_period count'
-  puts 'ALL_LISTENERS.lable ALL_LISTENERS'
+  puts 'ALL_LISTENERS.label ALL_LISTENERS'
   servers.each do |server|
-    puts "#{server[:name]}.lable #{server[:name]}"
+    puts "#{server[:name]}.label #{server[:name]}"
   end
 end
-
 
 def show_all_listeners(servers)
   agent = Mechanize.new
@@ -56,8 +55,8 @@ def show_all_listeners(servers)
     
     page = agent.get("#{server[:url]}")
 
-    page.search('//html/body/div/div/table/tr[8]/td[2]').each do |listeners|
-      server_listeners += listeners.text.to_i
+    page.search('//html/body/div/div/table/tr[8]/td[2]').each do |stream_listeners|
+      server_listeners += stream_listeners.text.to_i
       all_listeners += listeners.text.to_i
     end
     puts "#{server[:name]}.value #{server_listeners}"
@@ -65,7 +64,6 @@ def show_all_listeners(servers)
 
   puts "ALL_LISTENERS.value #{all_listeners}"
 end
-
 
 begin
   servers = get_server
