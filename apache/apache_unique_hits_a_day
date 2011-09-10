@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2011
+
+This file is part of a ApacheUniqueAccessLogHitsADay script to show all unique access log hits a day.
+
+This script is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This Script is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ApacheUniqueAccessLogHitsADay. If not, see <http://www.gnu.org/licenses/>.
+=end
+
+ACCESS_LOG = '/var/log/apache2/access.log'
+DATE = Time.now.strftime('%d/%b/%Y')
+
+def show_config
+  puts 'graph_title Apache2 unique access log hits a day'
+  puts 'graph_category apache'
+  puts 'graph_info This graph shows all access hits a day'
+  puts 'graph_vlabel Hits'
+  puts 'graph_scale yes'
+  puts 'graph_period count'
+  puts 'Unique Hits.label Hits'
+end
+
+def count_hits
+  addresses = []
+
+  File.open(ACCESS_LOG, 'r').each_line do |line|
+    if line.match(/\d+\/\w+\/\d+/).to_s.eql?(DATE)
+      addresses << line.match(/^\d+\.\d+\.\d+\.\d+/).to_s
+    end
+  end
+
+  puts "Unique Hits.value #{addresses.uniq.count}"
+end
+
+begin
+  if ARGV[0] == 'config'
+    show_config
+  else
+    count_hits
+  end
+end
