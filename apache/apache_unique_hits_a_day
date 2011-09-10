@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # encoding: utf-8
+
 =begin
 Copyright Daniel Meißner <dm@3st.be>, 2011
 
@@ -23,13 +24,13 @@ ACCESS_LOG = '/var/log/apache2/access.log'
 DATE = Time.now.strftime('%d/%b/%Y')
 
 def show_config
-  puts 'graph_title Apache2 unique access log hits a day'
+  puts 'graph_title Apache unique access log hits a day'
   puts 'graph_category apache'
   puts 'graph_info This graph shows all access hits a day'
   puts 'graph_vlabel Hits'
   puts 'graph_scale yes'
   puts 'graph_period count'
-  puts 'Unique Hits.label Hits'
+  puts 'Unique_Hits.label Unique Hits'
 end
 
 def count_hits
@@ -41,7 +42,7 @@ def count_hits
     end
   end
 
-  puts "Unique Hits.value #{addresses.uniq.count}"
+  puts "Unique_Hits.value #{addresses.uniq.count}"
 end
 
 begin
