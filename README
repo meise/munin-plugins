@@ -1,6 +1,6 @@
-== Discription
+== Description
 
-This repository containts a collection of munin scripts for different requirements and software.
+This repository contains a collection of munin scripts for different requirements and software.
 There are mostly written in ruby. Feel free to modify them for your needs.
 
 == License
