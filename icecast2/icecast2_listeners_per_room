@@ -1,0 +1,105 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2011
+
+This file is part of a Icecast2ListenersPerRoomMuninPlugin script to show the count of listeners per room on mutli icecast relays.
+
+This script is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This Script is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Icecast2ListenersPerRoomMuninPlugin. If not, see <http://www.gnu.org/licenses/>.
+=end
+
+require 'rubygems'
+require 'mechanize'
+
+def get_servers
+  servers = []
+  servers << {:name => "relay2", :url => "http://foo.bar:8000/"}
+  servers << {:name => "relay3", :url => "http://foo-baz:8000/"}
+  servers << {:name => "relay4", :url => "http://bla.blub:8000/"}
+
+  servers
+end
+
+def get_rooms
+  rooms = []
+  rooms << {:name => 'room1', :listeners => 0}
+  rooms << {:name => 'room2', :listeners => 0}
+  rooms << {:name => 'room3', :listeners => 0}
+  
+  rooms
+end
+
+def show_config(rooms)
+  puts 'graph_title Icecast2 All Listeners per room'
+  puts 'graph_category icecast'
+  puts 'graph_info This graph shows all listeners per room of all icecast servers'
+  puts 'graph_vlabel Listener'
+  puts 'graph_scale yes'
+  puts 'graph_period count'
+  puts 'ALL_ROOMS.label ALL_LISTENERS'
+  rooms.each do |room|
+    puts "#{room[:name]}.label #{room[:name]}"
+  end
+end
+
+def show_all_listeners(servers, rooms, login)
+  agent = Mechanize.new 
+  agent.basic_auth(login[:user], login[:password])
+  all_listeners = 0
+
+  servers.each do |server|
+    server_listeners = 0
+    
+    xml_string = agent.get("#{server[:url]}admin/stats.xml")
+    xml = Nokogiri::XML::parse(xml_string.body)
+      xml.search('/icestats/source').each do |mount_point|
+        mount_point.search('listeners').each do |listeners|
+            listener = listeners.child.to_s.to_i
+
+          case mount_point['mount']
+            when /^\/room1/
+              room = rooms.select{|l| l[:name] == "room1"}
+              room[0][:listeners] += listener
+            when /^\/room2/
+              room = rooms.select{|l| l[:name] == "room2"}
+              room[0][:listeners] += listener
+            when /^\/room3/
+              room = rooms.select{|l| l[:name] == "room3"}
+              room[0][:listeners] += listener
+          end
+        end
+      end
+    end
+  
+  sum = 0
+
+  rooms.each do |room|
+    puts "#{room[:name]}.value #{room[:listeners]}"
+    sum += room[:listeners]
+  end
+
+  puts "ALL_ROOMS.value #{sum}"
+end
+
+begin
+  login   = {:user => 'admin', :password => 'vocgotEfon4'}
+  servers = get_servers
+  rooms   = get_rooms
+  
+  if ARGV[0] == "config"
+    show_config(rooms)
+  else
+    show_all_listeners(servers, rooms, login)
+  end
+end
