@@ -1,0 +1,57 @@
+# The format of this file is documented in the dhcpd.leases(5) manual page.
+# This lease file was written by isc-dhcp-4.1.1-P1
+
+lease 172.16.66.50 {
+  starts 5 2011/07/22 08:58:16;
+  ends 5 2011/07/22 12:49:02;
+  tstp 5 2011/07/22 12:49:02;
+  cltt 5 2011/07/22 08:58:16;
+  binding state free;
+  hardware ethernet 00:04:13:2d:1b:05;
+  uid "\001\000\004\023-\033\005";
+}
+lease 172.16.66.53 {
+  starts 5 2011/07/29 19:28:58;
+  ends 6 2011/07/30 19:28:58;
+  tstp 6 2011/07/30 19:28:58;
+  cltt 5 2011/07/29 19:28:58;
+  binding state free;
+  hardware ethernet 00:1f:3b:8f:98:9d;
+  uid "\001\000\037;\217\230\235";
+}
+lease 172.16.66.57 {
+  starts 0 2011/08/28 20:05:24;
+  ends 0 2011/08/28 21:48:28;
+  tstp 0 2011/08/28 21:48:28;
+  cltt 0 2011/08/28 20:05:24;
+  binding state free;
+  hardware ethernet 52:54:00:3a:c0:8a;
+}
+lease 172.16.66.77 {
+  starts 5 2012/01/27 19:19:58;
+  ends 6 2012/01/28 19:19:58;
+  tstp 6 2012/01/28 19:19:58;
+  cltt 5 2012/01/27 19:19:58;
+  binding state free;
+  hardware ethernet 52:54:00:04:cf:da;
+  uid "\001RT\000\004\317\332";
+}
+lease 172.16.66.78 {
+  starts 3 2012/03/14 18:23:54;
+  ends 4 2012/03/15 18:23:54;
+  cltt 3 2012/03/14 18:23:54;
+  binding state active;
+  next binding state free;
+  hardware ethernet 52:54:00:04:cf:da;
+}
+lease 172.16.66.76 {
+  starts 3 2012/03/14 20:02:29;
+  ends 4 2012/03/15 20:02:29;
+  cltt 3 2012/03/14 20:02:29;
+  binding state active;
+  next binding state free;
+  hardware ethernet d8:5d:4c:ae:42:0c;
+  uid "\001\330]L\256B\014";
+  client-hostname "Freifunk-D85D4CAE420C";
+}
+server-duid "\000\001\000\001\025\271\331QRT\0003\000\367";
