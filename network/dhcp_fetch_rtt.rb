@@ -31,7 +31,7 @@ class DhcpFetchRtt < Munin::Plugin
   IP_ADDRESSES = []
   MUTEX        = Mutex.new
 
-  graph_attributes "Fetching round trip times inside a network, based on ip addresses located in dhcp.leases",  :category => 'network'
+  graph_attributes "round trip times inside network",  :category => 'network'
   
   declare_field :min, :label => 'min_delay', :type => :derive, :min => 0
   declare_field :avg, :label => 'avg_delay', :type => :derive, :min => 0

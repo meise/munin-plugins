@@ -29,7 +29,7 @@ require 'thread'
 class DhcpActiveLeases < Munin::Plugin
   LEASES_FILE  = ENV['leases_file'] ||= '/var/lib/dhcp/dhcpd.leases'
 
-  graph_attributes "Fetching active dhcp leases count",  :category => 'network'
+  graph_attributes "active dhcp leases",  :category => 'network'
   declare_field :active_leases, :label => 'active_leases', :type => :derive, :min => 0
 
   def retrieve_values
