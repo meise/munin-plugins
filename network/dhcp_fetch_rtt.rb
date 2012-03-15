@@ -54,7 +54,7 @@ class DhcpFetchRtt < Munin::Plugin
     # created for each ip address in leases file a thread
     for address in IP_ADDRESSES
       threads << Thread.new(address) { |addr|
-        data = %x{ping -c 4 #{addr}}.split(/=/).last.split(/\//)
+        data = %x{ping -c 4 -i 0.4 #{addr}}.split(/=/).last.split(/\//)
     
         unless data[1].nil?
           MUTEX.synchronize do
