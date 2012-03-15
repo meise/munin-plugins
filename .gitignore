@@ -9,3 +9,4 @@ pkg
 .redcar
 .sass-cache
 content/start_page.haml
+network/dhcp.leases
