@@ -1,13 +1,32 @@
 #!/usr/lib/evn ruby
 # encoding: utf-8
 
+=begin
+Copyright Daniel Meißner <dm@3st.be>, 2012
+
+This file is part of the munin plugin DhcpFetchRtt.
+
+DhcpFetchRtt is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+DhcpFetchRtt is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with DhcpFetchRtt. If not, see <http://www.gnu.org/licenses/>.
+=end
+
 require 'rubygems'
 require 'munin'
 # stdlib
 require 'pathname'
 require 'thread'
 
-class FetchRtt < Munin::Plugin
+class DhcpFetchRtt < Munin::Plugin
   LEASES_FILE  = ENV['leases_file'] ||= '/var/lib/dhcp/dhcpd.leases'
   IP_ADDRESSES = []
   MUTEX        = Mutex.new
@@ -75,4 +94,4 @@ class FetchRtt < Munin::Plugin
   end
 end
 
-FetchRtt.new.run
+DhcpFetchRtt.new.run
