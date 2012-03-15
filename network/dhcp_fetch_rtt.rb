@@ -80,7 +80,7 @@ class DhcpFetchRtt < Munin::Plugin
       thread.join
     end  
 
-    { :min => min_ping.min, :avg => avg(avg_ping), :max => max_ping.max }
+    { :min => min_ping.min.to_i, :avg => avg(avg_ping).to_i, :max => max_ping.max.to_i }
   end
   
   private
