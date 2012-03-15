@@ -1,4 +1,4 @@
-#!/usr/lib/evn ruby
+#!/usr/bin/env ruby
 # encoding: utf-8
 
 =begin
@@ -27,9 +27,9 @@ require 'pathname'
 require 'thread'
 
 class DhcpActiveLeases < Munin::Plugin
-  LEASES_FILE  = '/var/lib/dhcp/dhcpd.leases'
+  LEASES_FILE  = ENV['leases_file'] ||= '/var/lib/dhcp/dhcpd.leases'
 
-  graph_attributes "Fetching ",  :category => 'network', :info => ''
+  graph_attributes "Fetching active dhcp leases count",  :category => 'network'
   declare_field :active_leases, :label => 'active_leases', :type => :derive, :min => 0
 
   def retrieve_values
