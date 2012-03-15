@@ -4,7 +4,7 @@ This repository contains a collection of munin scripts for different requirement
 There are mostly written in ruby. Feel free to modify them for your needs.
 
 == License
-Copyright Daniel Meißner <dm@3st.be>, 2011
+Copyright Daniel Meißner <dm@3st.be>, 2011-2012
 
 This file is part of MuninPlugins.
 
