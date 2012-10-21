@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+=begin
+
+License
+-------
+
+Copyright Daniel Meißner <meise+munin@3st.be>, 2012
+
+This file is part of the munin plugin MuninConnectionCount.
+
+MuninConnectionCount is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MuninConnectionCount is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MuninConnectionCount. If not, see <http://www.gnu.org/licenses/>.
+
+Usage
+-----
+
+This is a wildcard plugin, to monitor destination port connections. For example,
+
+  ln -s /usr/share/munin/plugins/conn-count_ \
+            /etc/munin/plugins/conn-count_22_ssh
+
+will count established connections to local ssh port.
+
+=end
+
+require 'pathname'
+
+def determine_connections
+  %x{ss -o state established '( sport = :#{@service_port} )'}.split(/\n/) # get all established connection via ss and convert the result per line to array
+end
+
+def connection_count
+  @connections = determine_connections.count # header is included
+
+  # remove header
+  @connections == 1 ? @connections = 0 : @connections -= 1
+
+  puts "connections#{@service_port}.value #{@connections}"
+end
+
+def check_dependencies
+  if %x{which ss}.empty?
+    puts 'ss not available'
+    exit 1
+  end
+
+  script_name = $0.split(/_/)
+
+  if script_name.length > 1 # foobar_22
+    @service_port = script_name[1]
+    if script_name.length > 2 # foobar_22_ssh
+      @service_name = script_name[2]
+    end
+  else
+    puts 'check name should be conn-count_993(_imaps)'
+    exit 1
+  end
+end
+
+def show_config
+  puts "graph_title #{@service_name.nil? ? 'Port ' + @service_port.to_s : @service_name } connections"
+  puts 'graph_category network'
+  puts 'graph_vlabel Connections'
+  puts "connections#{@service_port}.label #{@service_name.nil? ? @service_port.to_s : @service_name}"
+  puts "connections#{@service_port}.info The number of established destination port #{@service_port} connections"
+end
+
+begin
+  check_dependencies
+
+  if ARGV[0] == "config"
+    show_config
+  else
+    connection_count
+  end
+end
