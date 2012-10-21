@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 =begin
-Copyright Daniel Meißner <dm@3st.be>, 2011
+Copyright Daniel Meißner <meise+munin@3st.be>, 2011-2012
 
 This file is part of a ShorewallLoggedActionsMuninPlugin script to show all logged shorewall actions in Munin.
 
@@ -37,23 +37,19 @@ def show_logged_action_counts
   drop = 0
   reject = 0
   port_scans = 0
-  
+
   File.open('/var/log/syslog').each_line do |line|
     if /\:REJECT\:/ =~ line
       reject += 1
-      if /DPT=1391\s/ =~ line
-        if /PROTO=TCP/ =~ line
-          port_scans += 1
-        end
+      if /DPT=111\s/ =~ line
+        port_scans += 1
       end
       next
     end
     if /\:DROP\:/ =~ line
       drop += 1
-      if /DPT=1391\s/ =~ line
-        if /PROTO=TCP/ =~ line
-          port_scans += 1
-        end
+      if /DPT=111\s/ =~ line
+        port_scans += 1
       end
       next
     end
