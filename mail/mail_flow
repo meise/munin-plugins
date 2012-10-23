@@ -93,7 +93,7 @@ def result
   puts "user_unknown.value #{@user_unknown}"
   puts "accepted.value #{@accepted}"
   puts "greylisted.value #{@greylisted}"
-  puts "rbl.value #{@greylisted}"
+  puts "rbl.value #{@rbl}"
 end
 
 def show_config
