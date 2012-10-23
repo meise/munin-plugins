@@ -29,7 +29,7 @@ require 'pathname'
 
 # determine the current date and define log file
 DATE          = Time.now.strftime("%b %d")
-LOG_FILE      = ENV['log'].nil? ? Pathname('/var/log/mail.log') : ENV['log']
+LOG_FILE      = ENV['log'] ||= Pathname('/var/log/mail.log').to_s
 
 # status for incoming mails
 @all          = 0
