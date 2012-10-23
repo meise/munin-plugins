@@ -1,0 +1,119 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+=begin
+
+License
+-------
+
+Copyright Daniel Meißner <meise+munin@3st.be>, 2012
+
+This file is part of the munin plugin MuninMailFlow.
+
+MuninMailFlow is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+MuninMailFlow is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with MuninMailFlow. If not, see <http://www.gnu.org/licenses/>.
+
+=end
+
+require 'pathname'
+
+# determine the current date and define log file
+DATE          = Time.now.strftime("%b %d")
+LOG_FILE      = ENV['log'].nil? ? Pathname('/var/log/mail.log') : ENV['log']
+
+# status for incoming mails
+@all          = 0
+@rbl          = 0
+@greylisted   = 0
+@user_unknown = 0
+@spam_blocked = 0
+@spam_tagged  = 0
+@accepted     = 0
+
+def analyze_log
+  File.open(LOG_FILE, 'r').each_line do |line|
+    # consider only entries from today
+    unless line =~ /#{DATE}/
+      next
+    end
+
+    # rbl reject
+    if line =~ /id=RBL_/
+      @rbl += 1
+      next
+    end
+
+    # User unknown in virtual alias table
+    if line =~ /User unknown/
+      @user_unknown += 1
+      next
+    end
+
+    # greylisted
+    if line =~ /id=GREY_/
+      @greylisted += 1
+      next
+    end
+
+    # blocked spam
+    if line =~ /Blocked SPAM/
+      @spam_blocked += 1
+      next
+    end
+
+    # tagged
+    if line =~ /Passed SPAMMY/
+      @spam_tagged += 1
+      next
+    end
+
+    # accept
+    if line =~ /Passed CLEAN/
+      @accepted += 1
+    end
+  end
+
+  @all = @rbl + @greylisted + @user_unknown + @spam_blocked + @spam_tagged + @accepted
+end
+
+def result
+  puts "all.value #{@all}"
+  puts "blocked.value #{@spam_blocked}"
+  puts "tagged.value #{@spam_tagged}"
+  puts "user_unknown.value #{@user_unknown}"
+  puts "accepted.value #{@accepted}"
+  puts "greylisted.value #{@greylisted}"
+  puts "rbl.value #{@greylisted}"
+end
+
+def show_config
+  puts "graph_title Mail flow overview"
+  puts 'graph_category postfix'
+  puts 'graph_vlabel Count'
+  puts "all.label all mails"
+  puts "rbl.label rejected via rbl"
+  puts "blocked.label detected and rejected spam"
+  puts "tagged.label tagged spam"
+  puts "user_unknown.label user unknown"
+  puts "accepted.label accepted mail"
+  puts "greylisted.label greylisted"
+end
+
+begin
+  if ARGV[0] == "config"
+    show_config
+  else
+    analyze_log
+    result
+  end
+end
