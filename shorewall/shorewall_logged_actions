@@ -19,6 +19,8 @@ You should have received a copy of the GNU General Public License
 along with ShorewallLoggedActionsMuninPlugin.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+DATE = Time.now.strftime("%b %d")
+
 def show_config
   puts 'graph_title Shorewall actions'
   puts 'graph_category network'
@@ -39,6 +41,11 @@ def show_logged_action_counts
   port_scans = 0
 
   File.open('/var/log/syslog').each_line do |line|
+    # only entries from today
+    unless line =~ /#{DATE}/
+      next
+    end
+
     if /\:REJECT\:/ =~ line
       reject += 1
       if /DPT=111\s/ =~ line
