@@ -1,0 +1,32 @@
+require 'rexml/document'
+
+# determine the current date and define log file
+DATE          = Time.now.strftime("%b %e")
+LOG_FILES     = ["#{Pathname('/var/log/mail.log')}", "#{Pathname('/var/log/mail.log.1')}"]
+
+def parse_stat_xml
+  xmlfile = REXML::Document.new( File.new("/home/meise/downloads/stat.xsl") )
+  REXML::XPath.match(xmlfile, '//client').count
+end
+
+def result( clients_count )
+  puts "push.value #{clients_count[:push]}"
+  puts "pull.value #{clients_count[:pull]}"
+end
+
+def show_config
+  puts "graph_title Mail flow overview"
+  puts 'graph_category nginx'
+  puts 'graph_vlabel Count'
+  puts "push.label push"
+  puts "pull.label pull"
+end
+
+begin
+  if ARGV[0] == "config"
+    show_config
+  else
+    analyze_log
+    result
+  end
+end
